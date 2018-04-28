@@ -40,8 +40,8 @@ class ViewController: UIViewController {
                 let person = Mapper<Person>().map(JSONString: dataAsString!)
     
                 self.nameLabel.text = person?.name
-                self.heightLabel.text = "\(String(describing: person?.height))"
-                self.massLabel.text = "\(String(describing: person?.mass))"
+                self.heightLabel.text = "\(String(describing: person?.height ?? 0))"
+                self.massLabel.text = "\(String(describing: person?.mass ?? 0))"
                 self.hairColorlabel.text = person?.hairColor
                 self.skinColorlabel.text = person?.skinColor
                 self.eyeColorlabel.text = person?.eyeColor
@@ -55,22 +55,20 @@ class ViewController: UIViewController {
         }
     }
     
-    enum HairColor:String {
-        case blond = "Blond"
-        case brown = "Brown"
-        case black = "Black"
-        case light = "Light"
-        case white = "White"
-    }
    
-
-
+}
+enum HairColor:String {
+    case blond = "Blond"
+    case brown = "Brown"
+    case black = "Black"
+    case light = "Light"
+    case white = "White"
 }
 
 struct Person:Mappable {
     var name:String?
-    var height:Int?
-    var mass:Int?
+    var height:Int = 0
+    var mass:Int = 0
     var hairColor:String?
     var skinColor:String?
     var eyeColor:String?
@@ -79,6 +77,7 @@ struct Person:Mappable {
     var homeworld:String?
     
     init?(map: Map) {
+    
         name    <- map["name"]
         height <- map["height"]
         gender     <- map["gender"]
@@ -102,9 +101,10 @@ struct Person:Mappable {
     }
     mutating func mapping(map: Map) {
         name    <- map["name"]
-        height <- map["height"]
+        height <- (map["height"], TransformOf<Int, String>(fromJSON: { Int($0!) }, toJSON: { $0.map { String($0) } }))
         gender     <- map["gender"]
         mass     <- map["mass"]
+        mass <- (map["mass"], TransformOf<Int, String>(fromJSON: { Int($0!) }, toJSON: { $0.map { String($0) } }))
         hairColor     <- map["hair_color"]
         birthYear     <- map["birth_year"]
         eyeColor     <- map["eye_color"]
