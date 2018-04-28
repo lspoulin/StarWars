@@ -35,19 +35,22 @@ class ViewController: UIViewController {
             
             if response.result.isSuccess {
                 print("This is a success")
+                guard let data  = response else {return}
+                
+                let dataAsString = String(bytes: data, encoding:.utf8)
                 
                 let json = response.value
                 print(json as Any)
                 
                 _ = json as! NSDictionary
             
-                var person = Mapper<Person>().map(JSONString: json as! String)
+                let person = Mapper<Person>().map(JSONString: "\(String(describing: json))" )
                 // It also supports object to json
                 //let JSONString = Mapper().toJSONString(person, prettyPrint: true)
                 // ObjectMapper also supports Alamofire(which I will write another blog about), Realm and a bunch of third parties.
                 // Mapping collections is also easy.
             
-                let person2 = Person(name: "Louis-Simon", height: 190, mass: 230, hairColor: "Black", eyeColor: "Green", skinColor: "fair", birthYear: "1980AD", gender: "Male")
+                _ = Person(name: "Louis-Simon", height: 190, mass: 230, hairColor: "Black", eyeColor: "Green", skinColor: "fair", birthYear: "1980AD", gender: "Male")
                 
                 //example if there is an id
                 /*let height:String = response.object(forKey: "height")! as? String ?? ""
@@ -61,11 +64,11 @@ class ViewController: UIViewController {
                 let homeworld:String = response.object(forKey: "homeworld")! as? String ?? ""
                 */
             
-                person = person2
+                //person = person2
                 //let person = Person(name:name)
                 self.nameLabel.text = person?.name
-                self.heightLabel.text = "".person?.height
-                //self.massLabel.text = String(person?.mass)
+                self.heightLabel.text = "\(String(describing: person?.height))"
+                self.massLabel.text = "\(String(describing: person?.mass))"
                 self.hairColorlabel.text = person?.hairColor
                 self.skinColorlabel.text = person?.skinColor
                 self.eyeColorlabel.text = person?.eyeColor
