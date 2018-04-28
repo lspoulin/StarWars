@@ -22,23 +22,25 @@ class ViewController: UIViewController {
     @IBOutlet weak var massLabel: UILabel!
     @IBOutlet weak var hairColorlabel: UILabel!
     @IBOutlet weak var skinColorlabel: UILabel!
-     @IBOutlet weak var eyeColorlabel: UILabel!
-     @IBOutlet weak var birthYearlabel: UILabel!
-     @IBOutlet weak var genderlabel: UILabel!
-     @IBOutlet weak var homeWorldlabel: UILabel!
+    @IBOutlet weak var eyeColorlabel: UILabel!
+    @IBOutlet weak var birthYearlabel: UILabel!
+    @IBOutlet weak var genderlabel: UILabel!
+    @IBOutlet weak var homeWorldlabel: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         let getPersonURL = URL(string:baseURL+getPersonEndpoint)!
         
         Alamofire.request(getPersonURL).responseJSON { response in
-            
+            if response.error != nil{
+                print("\(String(describing: response.error))")
+                return
+            }
             if response.result.isSuccess {
                 print("This is a success")
-                guard let data  = response.data else {return}
-                let dataAsString = String(bytes: data, encoding:.utf8)
-                let person = Mapper<Person>().map(JSONString: dataAsString!)
-    
+                guard let value  = response.value else {return}
+                let person = Mapper<Person>().map(JSONObject: value)
+                
                 self.nameLabel.text = person?.name
                 self.heightLabel.text = "\(String(describing: person?.height ?? 0))"
                 self.massLabel.text = "\(String(describing: person?.mass ?? 0))"
@@ -48,6 +50,8 @@ class ViewController: UIViewController {
                 self.birthYearlabel.text = person?.birthYear
                 self.genderlabel.text = person?.gender
                 self.homeWorldlabel.text = person?.homeworld
+                
+                
             }
             else {
                 print("Not a success")
@@ -77,7 +81,6 @@ struct Person:Mappable {
     var homeworld:String?
     
     init?(map: Map) {
-    
         name    <- map["name"]
         height <- map["height"]
         gender     <- map["gender"]
@@ -99,11 +102,12 @@ struct Person:Mappable {
         self.birthYear = birthYear
         self.gender = gender
     }
+    
     mutating func mapping(map: Map) {
         name    <- map["name"]
         height <- (map["height"], TransformOf<Int, String>(fromJSON: { Int($0!) }, toJSON: { $0.map { String($0) } }))
         gender     <- map["gender"]
-        mass     <- map["mass"]
+       // mass     <- map["mass"]
         mass <- (map["mass"], TransformOf<Int, String>(fromJSON: { Int($0!) }, toJSON: { $0.map { String($0) } }))
         hairColor     <- map["hair_color"]
         birthYear     <- map["birth_year"]
