@@ -35,37 +35,10 @@ class ViewController: UIViewController {
             
             if response.result.isSuccess {
                 print("This is a success")
-                guard let data  = response else {return}
-                
+                guard let data  = response.data else {return}
                 let dataAsString = String(bytes: data, encoding:.utf8)
-                
-                let json = response.value
-                print(json as Any)
-                
-                _ = json as! NSDictionary
-            
-                let person = Mapper<Person>().map(JSONString: "\(String(describing: json))" )
-                // It also supports object to json
-                //let JSONString = Mapper().toJSONString(person, prettyPrint: true)
-                // ObjectMapper also supports Alamofire(which I will write another blog about), Realm and a bunch of third parties.
-                // Mapping collections is also easy.
-            
-                _ = Person(name: "Louis-Simon", height: 190, mass: 230, hairColor: "Black", eyeColor: "Green", skinColor: "fair", birthYear: "1980AD", gender: "Male")
-                
-                //example if there is an id
-                /*let height:String = response.object(forKey: "height")! as? String ?? ""
-                let name:String = response.object(forKey: "name")! as? String ?? ""
-                let gender:String = response.object(forKey: "gender")! as? String ?? ""
-                let mass:String = response.object(forKey: "mass")! as? String ?? ""
-                let hairColor:String = response.object(forKey: "hair_color")! as? String ?? ""
-                let birthYear:String = response.object(forKey: "birth_year")! as? String ?? ""
-                let eyeColor:String = response.object(forKey: "eye_color")! as? String ?? ""
-                let skinColor:String = response.object(forKey: "skin_color")! as? String ?? ""
-                let homeworld:String = response.object(forKey: "homeworld")! as? String ?? ""
-                */
-            
-                //person = person2
-                //let person = Person(name:name)
+                let person = Mapper<Person>().map(JSONString: dataAsString!)
+    
                 self.nameLabel.text = person?.name
                 self.heightLabel.text = "\(String(describing: person?.height))"
                 self.massLabel.text = "\(String(describing: person?.mass))"
@@ -77,23 +50,9 @@ class ViewController: UIViewController {
                 self.homeWorldlabel.text = person?.homeworld
             }
             else {
-                print("Oh fuck no!")
+                print("Not a success")
             }
         }
-        
-        /*let person = Person()
-        
-        
-        nameLabel.text = person.name
-        heightLabel.text = "The height is \(person.height) inches"
-        massLabel.text = "The mass is \(person.mass) lbl"
-        
-        birthYearlabel.text = "the birthdate of \(person.name) is \(person.birthYear)"
-        hairColorlabel.text = person.hairColor.rawValue
-        print(person)*/
-        
-        
-        
     }
     
     enum HairColor:String {
@@ -109,6 +68,16 @@ class ViewController: UIViewController {
 }
 
 struct Person:Mappable {
+    var name:String?
+    var height:Int?
+    var mass:Int?
+    var hairColor:String?
+    var skinColor:String?
+    var eyeColor:String?
+    var birthYear:String?
+    var gender:String?
+    var homeworld:String?
+    
     init?(map: Map) {
         name    <- map["name"]
         height <- map["height"]
@@ -131,18 +100,6 @@ struct Person:Mappable {
         self.birthYear = birthYear
         self.gender = gender
     }
-    
-    var name:String?
-    var height:Int?
-    var mass:Int?
-    var hairColor:String?
-    var skinColor:String?
-    var eyeColor:String?
-    var birthYear:String?
-    var gender:String?
-    var homeworld:String?
-    
-    
     mutating func mapping(map: Map) {
         name    <- map["name"]
         height <- map["height"]
