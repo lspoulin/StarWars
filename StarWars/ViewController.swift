@@ -18,16 +18,18 @@ class ViewController: UIViewController {
     @IBOutlet weak var eyeColorlabel: UILabel!
     @IBOutlet weak var birthYearlabel: UILabel!
     @IBOutlet weak var genderlabel: UILabel!
-    @IBOutlet weak var homeWorldlabel: UILabel!
+  
+    
+    var homeworldURLString = ""
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        let apiManager:ApiManager = ApiManager()
-        apiManager.getPerson(completion: display)
+        let apiManager:ApiManager = ApiManager<Person>()
+        apiManager.get(getURL: apiManager.getPersonURL()!,completion: display)
         }
     
-    func display(myPerson:Person?)->(){
-        guard let person = myPerson else{
+    func display(myPerson:Any?)->(){
+        guard let person:Person = myPerson as? Person else{
             print("No person")
             return
         }
@@ -39,6 +41,21 @@ class ViewController: UIViewController {
         self.eyeColorlabel.text = person.eyeColor?.rawValue
         self.birthYearlabel.text = person.birthYear
         self.genderlabel.text = person.gender
-        self.homeWorldlabel.text = person.homeworld
+        self.homeworldURLString = person.homeworld!
+    }
+    @IBAction func showPlanetInfo(_ sender: Any) {
+        
+        performSegue(withIdentifier: "showPlanetInfo", sender: nil)
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if(segue.identifier=="showPlanetInfo"){
+            guard let destination = segue.destination as? ViewControllerPlanet else{
+                print("No PlanetViewController")
+                return
+            }
+            destination.homeworldURLString = homeworldURLString
+        }
     }
 }
+

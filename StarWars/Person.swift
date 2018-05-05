@@ -76,7 +76,6 @@ struct Person:Mappable {
         height <- (map["height"], TransformOf<Int, String>(fromJSON: { Int($0!) }, toJSON: { $0.map { String($0) } }))
         gender     <- map["gender"]
         mass <- (map["mass"], TransformOf<Int, String>(fromJSON: { Int($0!) }, toJSON: { $0.map { String($0) } }))
-        //hairColor     <- (map["hair_color"], TransformOf<HairColor, String>(fromJSON: {value in return HairColor.init(rawValue: value!)}, toJSON: {hairColor in return hairColor?.rawValue}))
         hairColor <- map["hair_color"]
         birthYear     <- map["birth_year"]
         eyeColor     <- map["eye_color"]

@@ -13,10 +13,15 @@ import ObjectMapper
 let baseURL = "https://swapi.co/api/"
 let getPersonEndpoint = "people/1/"
 
-class ApiManager{
-    public func getPerson(completion: @escaping (Person?) -> ()){
-        let getPersonURL = URL(string:baseURL+getPersonEndpoint)!
-        Alamofire.request(getPersonURL).responseJSON { response in
+class ApiManager<M:Mappable>{
+    
+    public func getPersonURL() -> String?{
+        return baseURL+getPersonEndpoint
+    }
+    
+    public func get(getURL:String, completion: @escaping ( _ mappable:Any) -> ()){
+        
+        Alamofire.request(getURL).responseJSON { response in
             if response.error != nil{
                 print("\(String(describing: response.error))")
                 return
@@ -25,17 +30,17 @@ class ApiManager{
                 print("This is a success")
                 guard let value  = response.value else {return}
                 print(value as Any)
-                guard let person = Mapper<Person>().map(JSONObject: value) else{
-                    print("Not a person")
+                
+                guard let mappableObject = Mapper<M>().map(JSONObject: value) else{
+                    print("Not a mappable")
                     return
                 }
-                completion(person)
+                completion(mappableObject)
             }
             else {
                 print("Not a success")
             }
-            
         }
-        completion(nil)
+        completion(AnyClass.self)
     }
 }
